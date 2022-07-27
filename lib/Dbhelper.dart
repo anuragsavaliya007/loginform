@@ -10,7 +10,7 @@ class Dbhelper{
         onCreate: (Database db, int version) async {
           // When creating the db, create the table
           await db.execute(
-              'CREATE TABLE Loginpage (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT,email TEXT,phone TEXT,cpassword TEXT,gender TEXT,languge TEXT,city TEXT,date TEXT)');
+              'CREATE TABLE Loginpage (id INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT,email TEXT,phone TEXT,cpassword TEXT,gender TEXT,languge BOOLEAN,city TEXT,date TEXT)');
         });
 
     return database;

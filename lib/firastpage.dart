@@ -7,7 +7,11 @@ import 'package:loginform/viewpage.dart';
 import 'package:sqflite/sqflite.dart';
 
 class firstpage extends StatefulWidget {
-  const firstpage({Key? key}) : super(key: key);
+  Map? map;
+  String? method;
+  firstpage(this.method, {this.map});
+
+  
 
   @override
   State<firstpage> createState() => _firstpageState();
@@ -15,11 +19,13 @@ class firstpage extends StatefulWidget {
 
 class _firstpageState extends State<firstpage> {
 
-  TextEditingController tdate = TextEditingController();
+
 
   String dropdownvalue = 'Select City';
   var _selectedGender;
-  List<bool> isChecked = [false,false,false,false];
+
+  Map m = {'Hindi':false,'Gujrati':false,'English':false,'Sanskrit':false};
+  // List<bool> isChecked = [false,false,false,false];
 
   var items = [
     'Select City',
@@ -35,6 +41,7 @@ class _firstpageState extends State<firstpage> {
   TextEditingController tphone = TextEditingController();
   TextEditingController tpassword = TextEditingController();
   TextEditingController tcpassword = TextEditingController();
+  TextEditingController tdate = TextEditingController();
   String? abc;
   String? bcd;
   String? cde;
@@ -51,6 +58,25 @@ class _firstpageState extends State<firstpage> {
   @override
   void initState() {
     super.initState();
+
+    if(widget.method == "update")
+      {
+
+
+
+        tfname.text = widget.map!['firstname'];
+        temail.text = widget.map!['email'];
+        tphone.text = widget.map!['phone'];
+        tpassword.text = widget.map!['cpassword'];
+        tcpassword.text = widget.map!['cpassword'];
+        _selectedGender = widget.map!['gender'];
+         m = widget.map!['languge'];
+        dropdownvalue = widget.map!['city'];
+        tdate.text = widget.map!['date'];
+
+
+      }
+
     Dbhelper().creatdatabase().then((value) {
 
       db = value;
@@ -59,9 +85,18 @@ class _firstpageState extends State<firstpage> {
 
   }
 
+ Future<bool> goback(){
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return viewpage();
+    },));
+
+    return Future.value();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return WillPopScope(child: GestureDetector(
       onTap: () {
         setState(() {
           FocusManager.instance.primaryFocus?.unfocus();
@@ -86,17 +121,17 @@ class _firstpageState extends State<firstpage> {
               child: TextFormField(
 
 
-               controller: tfname,
+                controller: tfname,
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.name,
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                  border: OutlineInputBorder(),
 
-                label: Text("First Name"),
+                  label: Text("First Name"),
                   errorText: abc,
 
-              ),),
+                ),),
             ),
             //email
             Padding(
@@ -179,13 +214,13 @@ class _firstpageState extends State<firstpage> {
                     def = "Enter phone number";
                   }
                   else if(tphone.text.length < 10)
-                    {
-                      def = "Enter Valid number";
-                    }
+                  {
+                    def = "Enter Valid number";
+                  }
                   else
-                    {
-                      def = null;
-                    }
+                  {
+                    def = null;
+                  }
                   setState(() {
 
                   });
@@ -218,9 +253,9 @@ class _firstpageState extends State<firstpage> {
                     cde = "to Short min 8 latter";
                   }
                   else
-                    {
-                      cde = null;
-                    }
+                  {
+                    cde = null;
+                  }
                   setState(() {
 
                   });
@@ -298,47 +333,47 @@ class _firstpageState extends State<firstpage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                  Checkbox(
-                    value: isChecked[0],
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked[0] = value!;
-                      });
-                    },
-                  ),
-                  Text("Hindi"),
-                  Checkbox(
-                    value: isChecked[1],
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked[1] = value!;
-                      });
-                    },
-                  ),
-                  Text("Gujrati"),
-                ],),
+                    Checkbox(
+                      value: m['Hindi'],
+                      onChanged: (value) {
+                        setState(() {
+                          m['Hindi'] = value!;
+                        });
+                      },
+                    ),
+                    Text("Hindi"),
+                    Checkbox(
+                      value: m['Gujrati'],
+                      onChanged: (value) {
+                        setState(() {
+                          m['Gujrati'] = value!;
+                        });
+                      },
+                    ),
+                    Text("Gujrati"),
+                  ],),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                  Checkbox(
-                    value: isChecked[2],
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked[2] = value!;
-                      });
-                    },
-                  ),
-                  Text("English"),
-                  Checkbox(
-                    value: isChecked[3],
-                    onChanged: (value) {
-                      setState(() {
-                        isChecked[3] = value!;
-                      });
-                    },
-                  ),
-                  Text("Sanskrit"),
-                ],),
+                    Checkbox(
+                      value:  m['English'],
+                      onChanged: (value) {
+                        setState(() {
+                          m['English'] = value!;
+                        });
+                      },
+                    ),
+                    Text("English"),
+                    Checkbox(
+                      value: m['Sanskrit'],
+                      onChanged: (value) {
+                        setState(() {
+                          m['Sanskrit'] = value!;
+                        });
+                      },
+                    ),
+                    Text("Sanskrit"),
+                  ],),
               ],),
             ),
             Text("$lerror"),
@@ -378,12 +413,12 @@ class _firstpageState extends State<firstpage> {
               child: TextFormField(
                 controller: tdate,
                 decoration: InputDecoration(
-                    suffixIcon: IconButton(onPressed: () {
+                  suffixIcon: IconButton(onPressed: () {
 
-                      _selectDate(context);
+                    _selectDate(context);
 
-                    }, icon: Icon(Icons.calendar_today)),
-                    border: OutlineInputBorder(),
+                  }, icon: Icon(Icons.calendar_today)),
+                  border: OutlineInputBorder(),
                   label: Text("Select Date"),
 
                 ),
@@ -395,52 +430,65 @@ class _firstpageState extends State<firstpage> {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(onPressed: () async{
 
-                // if(tfname.text.isNotEmpty && temail.text.isNotEmpty && tphone.text.isNotEmpty && tpassword.text.isNotEmpty && tcpassword.text.isNotEmpty && tpassword == tcpassword && _selectedGender != null && isChecked == false && )
+                String firstname = tfname.text;
+                String email = temail.text;
+                String phone = tphone.text;
+                String cpassword = tcpassword.text;
+                String gender = _selectedGender.toString();
+                Map languge = m;
+                String city = dropdownvalue;
+                String date = tdate.text;
 
                 if(tpassword.text == tcpassword.text){
-                  String firstname = tfname.text;
-                  String email = temail.text;
-                  String phone = tphone.text;
-                  String cpassword = tcpassword.text;
-                  String gender = _selectedGender.toString();
-                  String languge = "";
-                  String city = dropdownvalue;
-                  String date = tdate.text;
+
+                  if(widget.method == "insert"){
+
+                    String qry = "INSERT INTO Loginpage(firstname,email,phone,cpassword,gender,languge,city,date) VALUES('$firstname','$email','$phone','$cpassword','$gender','$languge','$city','$date')";
+                    int id = await db!.rawInsert(qry);
+
+                    print(id);
 
 
-                  String qry = "INSERT INTO Loginpage(firstname,email,phone,cpassword,gender,languge,city,date) VALUES('$firstname','$email','$phone','$cpassword','$gender','$languge','$city','$date')";
-                  int id = await db!.rawInsert(qry);
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
 
-                  print(id);
+                      return viewpage();
 
+                    },));
+
+
+                  }else{
+
+                    String q = " update Loginpage set firstname='$firstname',email='$email',phone='$phone',cpassword='$cpassword',gender='$gender',languge='$languge',city='$city',date='$date' where id=${widget.map!['id']}";
+                    int id = await db!.rawUpdate(q);
+                    if(id == 1){
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                        return viewpage();
+                      },));
+                    }
+                  }
+
+
+
+                }
+                else
+                {
+                  cpassword = "Not Match Password ! plese Try Again ";
                   setState(() {
 
                   });
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
 
-                    return viewpage();
-
-                  },));
                 }
-                else
-                  {
-                    cpassword = "Not Match Password ! plese Try Again ";
-                    setState(() {
-
-                    });
-
-                  }
 
                 setState(() {
 
                 });
-              }, child: Text("Submit")),
+              }, child: Text("${widget.method}")),
             ),
 
           ],),
         )),
       ),
-    );
+    ), onWillPop:goback);
   }
 
   _selectDate(BuildContext context) async {

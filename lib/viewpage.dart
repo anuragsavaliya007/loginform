@@ -13,8 +13,8 @@ class viewpage extends StatefulWidget {
 
 class _viewpageState extends State<viewpage> {
 
-  List<Map<String, Object?>> l = [];
-
+  List<Map<String, Object?>> l = List.empty(growable: true);
+  Database? db;
   bool status = false;
   @override
   void initState() {
@@ -28,9 +28,10 @@ class _viewpageState extends State<viewpage> {
   getalldata() async {
 
 
-    Database db = await Dbhelper().creatdatabase();
+    db = await Dbhelper().creatdatabase();
     String qry = "SELECT * FROM Loginpage";
-    l = await db.rawQuery(qry);
+    List<Map<String, Object?>> x = await db!.rawQuery(qry);
+    l.addAll(x);
 
     status = true;
 
@@ -50,17 +51,53 @@ class _viewpageState extends State<viewpage> {
 
           Map m = l[index];
           return ListTile(
+            onLongPress: () {
+
+              showDialog(context: context, builder: (context) {
+
+                return AlertDialog(
+                  title: Text("Delete"),
+                  content: Text("Ary you sure to delete data"),
+                  actions: [
+                    TextButton(onPressed: () {
+                      Navigator.pop(context);
+                      int id = m['id'];
+
+                      String qry = "DELETE FROM Loginpage WHERE  id= '$id'";
+                      db!.rawDelete(qry);
+                      l.removeAt(index);
+                      setState(() {
+
+                      });
+
+                    }, child: Text("Yes")),
+                    TextButton(onPressed: () {
+                      Navigator.pop(context);
+                    }, child: Text("No"))
+                  ],
+                );
+
+              },);
+
+            },
             leading: Text("${m['id']}"),
             title: Text("${m['firstname']}"),
+            trailing: IconButton(onPressed: () {
+
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return firstpage("update",map: m,);
+              },));
+
+            }, icon: Icon(Icons.edit)),
           );
 
       },): Center(child: Text("No Data Found"),)) : Center(child: CircularProgressIndicator(),),
 
       floatingActionButton: FloatingActionButton(onPressed: () {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-          return firstpage();
+          return firstpage("insert");
         },));
-      },),
+      },child: Icon(Icons.add)),
 
 
 
